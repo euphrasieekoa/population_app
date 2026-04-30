@@ -1,0 +1,10 @@
+:root{--primary:#0d6efd;--primary-light:#e7f1ff;--bg:#f8f9fa;--card:#fff;--text:#212529;--border:#dee2e6}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif}
+.accordion-button:not(.collapsed){background:var(--primary-light);color:var(--primary);font-weight:500}
+.accordion-button:focus{box-shadow:0 0 0 0.25rem rgba(13,110,253,.25)}
+.card{border:none;box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:.5rem}
+.form-label{font-weight:500;font-size:.9rem}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(13,110,253,.15)}
+.display-4{font-weight:700;letter-spacing:2px}
+canvas{max-height:180px}
+.list-group-item{padding:.75rem 1rem}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+{% if person %}
+
+<!-- CSS STRICT POUR L'EXPORT PDF -->
+<style>
+  @media print {
+    /* 1. Configuration de la page */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #fff;
+      color: #000;
+    }
+
+    /* 2. Masquer TOUS les éléments parasites */
+    .navbar, .navbar *, 
+    footer, 
+    .no-print, 
+    .alert, 
+    button, 
+    .d-print-none,
+    .container > .card:first-child { /* Masque la carte de l'interface écran */
+      display: none !important;
+    }
+
+    /* 3. Afficher UNIQUEMENT la zone d'impression */
+    #print-area {
+      display: block !important;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      margin: 0;
+      padding: 20px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    
+    /* 4. Styles du tableau pour le PDF */
+    #print-area table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+    
+    #print-area th, #print-area td {
+      border: 1px solid #333;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+      color: #000 !important;
+      background-color: #fff !important;
+    }
+    
+    #print-area th {
+      background-color: #f0f0f0 !important;
+      font-weight: bold;
+      width: 35%;
+    }
+    
+    #print-area td {
+      width: 65%;
+    }
+
+    .section-title {
+      background-color: #e0e0e0 !important;
+      text-align: center;
+      font-weight: bold;
+      text-transform: uppercase;
+      border: 1px solid #333 !important;
+    }
+    
+    .header-print {
+      text-align: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .header-print h1 { margin: 0; font-size: 22px; text-transform: uppercase; }
+    .header-print p { margin: 5px 0 0; color: #555; font-size: 12px; }
+    
+    .footer-print {
+      text-align: right;
+      font-size: 10px;
+      color: #666;
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 5px;
+    }
+  }
+</style>
+
+<!-- ZONE D'AFFICHAGE ÉCRAN (Boutons, etc.) -->
+<!-- La classe 'no-print' assure que ceci n'apparaît PAS dans le PDF -->
+<div class="card p-4 mb-4 no-print">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Fiche de {{ person.nom }} {{ person.prenom }}</h4>
+    <div class="d-flex gap-2">
+      <button onclick="window.print()" class="btn btn-primary">🖨️ Exporter en PDF</button>
+      <a href="{{ url_for('view_form') }}" class="btn btn-outline-secondary">Nouveau code</a>
+    </div>
+  </div>
+  <div class="alert alert-info">
+    <strong>Info :</strong> Cliquez sur "Exporter en PDF" pour télécharger la fiche officielle. <br>
+    <small>Assurez-vous de décocher "En-têtes et pieds de page" dans les options d'impression pour un résultat parfait.</small>
+  </div>
+</div>
+
+<!-- ZONE D'IMPRESSION (Invisible à l'écran, visible UNIQUEMENT dans le PDF) -->
+<div class="d-none" id="print-area">
+  
+  <div class="header-print">
+    <h1>Fiche Individuelle</h1>
+    <p>Système de collecte de données populationnelles</p>
+  </div>
+
+  <table>
+    <tr><th colspan="2" class="section-title">Identification</th></tr>
+    <tr><th>Nom</th><td>{{ person.nom }}</td></tr>
+    <tr><th>Prénom</th><td>{{ person.prenom }}</td></tr>
+    <tr><th>Sexe</th><td>{{ person.sexe or 'N/A' }}</td></tr>
+    <tr><th>Date de naissance</th><td>{% if person.date_naissance %}{{ person.date_naissance.strftime('%d/%m/%Y') }}{% else %}N/A{% endif %}</td></tr>
+    <tr><th>Âge</th><td>{{ person.age or '?' }} ans</td></tr>
+    <tr><th>Nationalité</th><td>{{ person.nationalite or 'N/A' }}</td></tr>
+    <tr><th>Pays</th><td>{{ person.pays or 'N/A' }}</td></tr>
+    <tr><th>Situation</th><td>{{ person.situation or 'N/A' }}</td></tr>
+    <tr><th>Langues</th><td>{{ person.langues or 'N/A' }}</td></tr>
+
+    <tr><th colspan="2" class="section-title">Coordonnées & Logement</th></tr>
+    <tr><th>Téléphone</th><td>{{ person.telephone or 'N/A' }}</td></tr>
+    <tr><th>Email</th><td>{{ person.email or 'N/A' }}</td></tr>
+    <tr><th>Adresse</th><td>{{ person.adresse or 'N/A' }}</td></tr>
+    <tr><th>Quartier / Zone</th><td>{{ person.quartier or 'N/A' }} ({{ person.zone or 'N/A' }})</td></tr>
+    <tr><th>Statut / Type Logement</th><td>{{ person.statut_logement or 'N/A' }} - {{ person.type_logement or 'N/A' }}</td></tr>
+    <tr><th>Pièces</th><td>{{ person.nb_pieces or 0 }}</td></tr>
+    <tr><th>Eau / Électricité</th><td>Eau: {{ person.acces_eau or 'N/A' }} | Élec: {{ person.acces_electricite or 'N/A' }}</td></tr>
+
+    <tr><th colspan="2" class="section-title">Socio-Économique</th></tr>
+    <tr><th>Niveau d'étude</th><td>{{ person.niveau_etude or 'N/A' }}</td></tr>
+    <tr><th>Statut Professionnel</th><td>{{ person.statut_pro or 'N/A' }}</td></tr>
+    <tr><th>Profession</th><td>{{ person.profession or 'N/A' }}</td></tr>
+    <tr><th>Type de contrat</th><td>{{ person.type_contrat or 'N/A' }}</td></tr>
+    <tr><th>Revenus Mensuels</th><td>{{ "%.2f"|format(person.revenus_usd or 0) }} $</td></tr>
+    <tr><th>Personnes à charge</th><td>{{ person.personnes_a_charge or 0 }}</td></tr>
+
+    <tr><th colspan="2" class="section-title">Santé & Numérique</th></tr>
+    <tr><th>État de santé</th><td>{{ person.etat_sante or 'N/A' }}</td></tr>
+    <tr><th>Couverture santé</th><td>{{ person.couverture_sante or 'N/A' }}</td></tr>
+    <tr><th>Handicap</th><td>{% if person.handicap %}Oui{% else %}Non{% endif %}</td></tr>
+    <tr><th>Accès Internet</th><td>{{ person.acces_internet or 'N/A' }}</td></tr>
+    <tr><th>Appareil principal</th><td>{{ person.appareil or 'N/A' }}</td></tr>
+    <tr><th>Temps de trajet</th><td>{{ person.temps_trajet_min or 0 }} min</td></tr>
+
+    <tr><th colspan="2" class="section-title">Opinions</th></tr>
+    <tr><th>Satisfaction</th><td>{{ '★' * (person.satisfaction_globale or 0) }}</td></tr>
+    <tr><th>Problèmes</th><td>{{ person.problemes or 'N/A' }}</td></tr>
+    <tr><th>Besoins</th><td>{{ person.besoins or 'N/A' }}</td></tr>
+    <tr><th>Suggestions</th><td>{{ person.suggestions or 'N/A' }}</td></tr>
+  </table>
+
+  <div class="footer-print">
+    Document généré le {% if person.created_at %}{{ person.created_at.strftime('%d/%m/%Y à %H:%M') }}{% else %}N/A{% endif %}
+  </div>
+</div>
+
+{% else %}
+<div class="card p-4 mx-auto" style="max-width:600px">
+  <h4 class="mb-3 text-center">Voir mon formulaire</h4>
+  <form method="POST" class="mt-3"><div class="mb-3"><label class="form-label">Code</label><input name="code" type="text" class="form-control text-center fs-4" maxlength="6" required pattern="[A-Za-z0-9]{6}" placeholder="XXXXXX"></div><button class="btn btn-primary w-100">Afficher</button></form>
+</div>
+{% endif %}
+{% endblock %}

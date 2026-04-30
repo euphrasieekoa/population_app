@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width:600px">
+  <h4 class="mb-3">Modifier ma fiche</h4>
+  <form method="POST">
+    <div class="mb-3"><label class="form-label">Nom *</label><input name="nom" type="text" class="form-control" value="{{ person.nom }}" required style="text-transform:uppercase;"></div>
+    <div class="mb-3"><label class="form-label">Prenom</label><input name="prenom" type="text" class="form-control" value="{{ person.prenom }}"></div>
+    <div class="mb-3"><label class="form-label">Nationalite</label><input name="nationalite" type="text" class="form-control" value="{{ person.nationalite }}"></div>
+    <div class="mb-3"><label class="form-label">Pays</label><input name="pays" type="text" class="form-control" value="{{ person.pays }}"></div>
+    <div class="d-flex gap-2"><button type="submit" class="btn btn-success flex-grow-1">Sauvegarder</button><a href="{{ url_for('records') }}" class="btn btn-outline-secondary">Annuler</a></div>
+  </form>
+</div>
+{% endblock %}

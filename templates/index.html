@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+{% if submitted and code %}
+<div class="alert alert-success text-center py-4">
+  <h3>Enregistrement reussi</h3>
+  <p class="lead">Votre code d'acces unique :</p>
+  <div class="display-4 fw-bold text-primary my-3" id="access-code">{{ code }}</div>
+  <button class="btn btn-outline-primary" id="copyBtn" onclick="copyCode()">Copier le code</button>
+  <p class="mt-3 text-muted small">Conservez-le. Aucune recuperation possible.</p>
+  <a href="{{ url_for('consult') }}" class="btn btn-success mt-2">Acceder a mes donnees</a>
+  <a href="{{ url_for('view_form') }}" class="btn btn-outline-primary mt-2">Voir mon formulaire</a>
+</div>
+<script>
+function copyCode() {
+  const code = document.getElementById('access-code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.innerText = 'Copié !'; btn.classList.replace('btn-outline-primary', 'btn-success');
+    setTimeout(() => { btn.innerText = 'Copier le code'; btn.classList.replace('btn-success', 'btn-outline-primary'); }, 2000);
+  });
+}
+</script>
+{% else %}
+<form method="POST" action="{{ url_for('submit') }}" id="popForm" novalidate>
+  <input type="hidden" name="consent_rgpd" id="consent_rgpd" value="false">
+  <div class="accordion" id="formAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sec1">Identification</button></h2>
+      <div id="sec1" class="accordion-collapse collapse show" data-bs-parent="#formAccordion">
+        <div class="accordion-body row g-3">
+          <div class="col-md-4"><label class="form-label">Nom *</label><input name="nom" type="text" class="form-control" required pattern="[A-Z\s\-\']+" style="text-transform:uppercase;"></div>
+          <div class="col-md-4"><label class="form-label">Prenom</label><input name="prenom" type="text" class="form-control"></div>
+          <div class="col-md-4"><label class="form-label">Sexe</label><select name="sexe" class="form-select"><option value="">--</option><option>Homme</option><option>Femme</option><option>Autre</option></select></div>
+          <div class="col-md-4"><label class="form-label">Date naissance *</label><input name="date_naissance" type="date" class="form-control" required id="dob" max="{{ today.strftime('%Y-%m-%d') }}"></div>
+          <div class="col-md-2"><label class="form-label">Age</label><input name="age" type="number" class="form-control" readonly id="ageDisplay" min="0" max="120" placeholder="Auto"></div>
+          <div class="col-md-3"><label class="form-label">Nationalite</label><select name="nationalite" id="natSelect" class="form-select"><option value="">--</option><option value="Francaise">Francaise</option><option value="Americaine">Americaine</option><option value="Britannique">Britannique</option><option value="Allemande">Allemande</option><option value="Espagnole">Espagnole</option><option value="Italienne">Italienne</option><option value="Belge">Belge</option><option value="Suisse">Suisse</option><option value="Canadienne">Canadienne</option><option value="Chinoise">Chinoise</option><option value="Japonaise">Japonaise</option><option value="Indienne">Indienne</option><option value="Bresilienne">Bresilienne</option><option value="Marocaine">Marocaine</option><option value="Tunisienne">Tunisienne</option><option value="Algerienne">Algerienne</option><option value="Senegalaise">Senegalaise</option><option value="Ivoirienne">Ivoirienne</option><option value="Camerounaise">Camerounaise</option><option value="Congolaise">Congolaise</option><option value="Maliane">Maliane</option><option value="Nigeriane">Nigeriane</option><option value="Egyptienne">Egyptienne</option><option value="Sud-africaine">Sud-africaine</option><option value="Autre">Autre</option></select></div>
+          <div class="col-md-3"><label class="form-label">Pays (auto)</label><input name="pays" id="paysInput" type="text" class="form-control" readonly placeholder="Auto"></div>
+          <div class="col-md-6"><label class="form-label">Langues</label><input name="langues" type="text" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Personnes a charge</label><input name="personnes_a_charge" type="number" class="form-control" min="0" value="0"></div>
+          <div class="col-md-6"><label class="form-label">Situation</label><select name="situation" class="form-select"><option value="">--</option><option>Celibataire</option><option>Marie(e)</option><option>Divorce(e)</option><option>Veuf/Veuve</option><option>Union libre</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec2">Coordonnees & Logement</button></h2>
+      <div id="sec2" class="accordion-collapse collapse" data-bs-parent="#formAccordion">
+        <div class="accordion-body row g-3">
+          <div class="col-md-6"><label class="form-label">Telephone *</label><input name="telephone" type="tel" class="form-control" required pattern="\+?[\d\s\-]{7,15}"></div>
+          <div class="col-md-6"><label class="form-label">Email</label><input name="email" type="email" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Adresse</label><textarea name="adresse" class="form-control" rows="2"></textarea></div>
+          <div class="col-md-6"><label class="form-label">Quartier/Ville</label><input name="quartier" type="text" class="form-control"></div>
+          <div class="col-md-4"><label class="form-label">Type logement</label><select name="type_logement" class="form-select"><option>Appartement</option><option>Maison</option><option>Autre</option></select></div>
+          <div class="col-md-4"><label class="form-label">Pieces</label><input name="nb_pieces" type="number" class="form-control" min="0"></div>
+          <div class="col-md-4"><label class="form-label">Zone</label><select name="zone" class="form-select"><option>Urbaine</option><option>Periurbaine</option><option>Rurale</option></select></div>
+          <div class="col-md-6"><label class="form-label">Eau</label><select name="acces_eau" class="form-select"><option>Oui</option><option>Non</option></select></div>
+          <div class="col-md-6"><label class="form-label">Electricite</label><select name="acces_electricite" class="form-select"><option>Oui</option><option>Non</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec3">Emploi & Revenus ($)</button></h2>
+      <div id="sec3" class="accordion-collapse collapse" data-bs-parent="#formAccordion">
+        <div class="accordion-body row g-3">
+          <div class="col-md-6"><label class="form-label">Niveau etude</label><select name="niveau_etude" class="form-select"><option>Aucun</option><option>Primaire</option><option>Secondaire</option><option>Licence</option><option>Master+</option></select></div>
+          <div class="col-md-6"><label class="form-label">Statut pro</label><select name="statut_pro" class="form-select"><option>Salarié</option><option>Independant</option><option>Etudiant</option><option>Chomeur</option><option>Retraité</option><option>Inactif</option></select></div>
+          <div class="col-md-6"><label class="form-label">Type contrat</label><select name="type_contrat" class="form-select"><option>CDI</option><option>CDD</option><option>Informel</option><option>Stage</option><option>Aucun</option></select></div>
+          <div class="col-md-6"><label class="form-label">Profession</label><input name="profession" type="text" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label">Revenus ($) *</label><input name="revenus_usd" type="number" class="form-control" step="0.01" min="0" required></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec4">Sante & Numerique</button></h2>
+      <div id="sec4" class="accordion-collapse collapse" data-bs-parent="#formAccordion">
+        <div class="accordion-body row g-3">
+          <div class="col-md-4"><label class="form-label">Sante</label><select name="etat_sante" class="form-select"><option>Excellent</option><option>Bon</option><option>Moyen</option><option>Faible</option></select></div>
+          <div class="col-md-4"><label class="form-label">Couverture sante</label><select name="couverture_sante" class="form-select"><option>Oui</option><option>Partielle</option><option>Non</option></select></div>
+          <div class="col-md-4"><label class="form-label">Trajet (min)</label><input name="temps_trajet_min" type="number" class="form-control" min="0"></div>
+          <div class="col-md-4"><label class="form-label">Internet</label><select name="acces_internet" class="form-select"><option>Oui</option><option>Non</option><option>Mobile uniquement</option></select></div>
+          <div class="col-md-4"><label class="form-label">Appareil</label><input name="appareil" type="text" class="form-control"></div>
+          <div class="col-md-4"><label class="form-label">Satisfaction (1-5)</label><input name="satisfaction_globale" type="range" class="form-range" min="1" max="5" value="3" oninput="document.getElementById('satVal').innerText=this.value"><span id="satVal" class="badge bg-primary">3</span></div>
+          <div class="col-12"><div class="form-check"><input name="handicap" type="checkbox" class="form-check-input"><label class="form-check-label">Handicap</label></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sec5">Opinions</button></h2>
+      <div id="sec5" class="accordion-collapse collapse" data-bs-parent="#formAccordion">
+        <div class="accordion-body row g-3">
+          <div class="col-12"><label class="form-label">Problemes</label><textarea name="problemes" class="form-control" rows="2"></textarea></div>
+          <div class="col-12"><label class="form-label">Besoins</label><textarea name="besoins" class="form-control" rows="2"></textarea></div>
+          <div class="col-12"><label class="form-label">Suggestions</label><textarea name="suggestions" class="form-control" rows="2"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card mt-3 p-3 bg-light">
+    <div class="form-check"><input class="form-check-input" type="checkbox" id="rgpdCheck"><label class="form-check-label" for="rgpdCheck">J'accepte le traitement anonyme et je conserve mon code.</label></div>
+    <button type="submit" class="btn btn-primary mt-2 w-100" disabled id="submitBtn">Valider & Generer code</button>
+  </div>
+</form>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form=document.getElementById('popForm'), btn=document.getElementById('submitBtn'), check=document.getElementById('rgpdCheck'), hidden=document.getElementById('consent_rgpd'), dob=document.getElementById('dob'), ageD=document.getElementById('ageDisplay'), nat=document.getElementById('natSelect'), pays=document.getElementById('paysInput');
+  const natMap={"Francaise":"France","Americaine":"Etats-Unis","Britannique":"Royaume-Uni","Allemande":"Allemagne","Espagnole":"Espagne","Italienne":"Italie","Belge":"Belgique","Suisse":"Suisse","Canadienne":"Canada","Chinoise":"Chine","Japonaise":"Japon","Indienne":"Inde","Bresilienne":"Bresil","Marocaine":"Maroc","Tunisienne":"Tunisie","Algerienne":"Algerie","Senegalaise":"Senegal","Ivoirienne":"Cote d'Ivoire","Camerounaise":"Cameroun","Congolaise":"Congo","Maliane":"Mali","Nigeriane":"Nigeria","Egyptienne":"Egypte","Sud-africaine":"Afrique du Sud"};
+  check?.addEventListener('change',()=>{hidden.value=check.checked?'true':'false';btn.disabled=!check.checked});
+  dob?.addEventListener('change',()=>{if(!dob.value){ageD.value='';return}const t=new Date(),b=new Date(dob.value);let a=t.getFullYear()-b.getFullYear();const m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;ageD.value=(a>=0&&a<=120)?a:''});
+  nat?.addEventListener('change',()=>{const v=nat.value;if(natMap[v]){pays.value=natMap[v];pays.readOnly=true}else if(v==="Autre"){pays.value="";pays.readOnly=false;pays.placeholder="Saisir manuellement"}else{pays.value="";pays.readOnly=true}});
+  form?.addEventListener('submit',e=>{if(!check.checked){e.preventDefault();alert("Cochez la case de consentement.")}});
+});
+</script>
+{% endif %}
+{% endblock %}

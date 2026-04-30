@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Systeme Populationnel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">Data Population</a>
+    {% if session.get('current_user_id') %}
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('index') }}" class="btn btn-light btn-sm">Formulaire</a>
+      <a href="{{ url_for('records') }}" class="btn btn-outline-light btn-sm">Annuaire</a>
+      <a href="{{ url_for('view_form') }}" class="btn btn-outline-light btn-sm">Voir formulaire</a>
+      <a href="{{ url_for('audit') }}" class="btn btn-outline-light btn-sm">Audit</a>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Deconnexion</a>
+    </div>
+    {% else %}
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('consult') }}" class="btn btn-outline-light btn-sm">Consulter</a>
+      <a href="{{ url_for('view_form') }}" class="btn btn-outline-light btn-sm">Voir formulaire</a>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+<div class="container py-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for c,m in messages %}<div class="alert alert-{{ c }} alert-dismissible fade show">{{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
